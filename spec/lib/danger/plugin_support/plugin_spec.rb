@@ -1,0 +1,27 @@
+# frozen_string_literal: true
+
+RSpec.describe Danger::Plugin do
+  it "creates an instance name based on the class name" do
+    class DangerTestClassNamePlugin < Danger::Plugin; end
+    expect(DangerTestClassNamePlugin.instance_name).to eq("test_class_name_plugin")
+  end
+
+  it "should forward unknown method calls to the dangerfile" do
+    class DangerTestForwardPlugin < Danger::Plugin; end
+
+    class DangerFileMock
+      attr_accessor :pants
+
+      def check(*args, **kargs); end
+    end
+
+    plugin = DangerTestForwardPlugin.new(DangerFileMock.new)
+    expect do
+      plugin.pants
+    end.to_not raise_error
+
+    expect do
+      plugin.check("a", "b", verbose: true)
+    end.to_not raise_error
+  end
+end
